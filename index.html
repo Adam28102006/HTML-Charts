@@ -35,19 +35,19 @@ color: white;
 <div class="container"> 
 
 <h1 class="text-center mt-5">Nature of Enterprise project- By Adam O'Connor Kenny, TJ Ermitano, Abdul Lafiaji, Micheal Juna and Jack Kells</h1> 
-<p class="lead text-center">Descriptive Statistics | Visualisation | Basic Machine Learning</p> 
+<p class="lead text-center">The effects of screentime on students</p> 
 
  
 <h2 class="section-title">Dataset Overview</h2> 
 <p> 
-This is a placeholder paragraph 
+The dataset shows that there is a positive corrilation between how many hours you spend daily on a phone, and how little hours of sleep you get. The graphs also show that the more sleep students got lead to a higher mental health score, with the same being true for the more screentime leading to a higher addiction score.
 </p> 
 
 <div class="row text-center"> 
 <div class="col-md-4"> 
 <div class="card shadow-sm"> 
 <div class="card-body"> 
-<h5>Mean</h5> 
+<h5>Mean Screentime </h5> 
 <p id="meanValue" class="display-6">--</p> 
 </div> 
 </div> 
@@ -55,7 +55,7 @@ This is a placeholder paragraph
 <div class="col-md-4"> 
 <div class="card shadow-sm"> 
 <div class="card-body"> 
-<h5>Median</h5> 
+<h5>Median Screentime </h5> 
 <p id="medianValue" class="display-6">--</p> 
 </div> 
 </div> 
@@ -63,7 +63,7 @@ This is a placeholder paragraph
 <div class="col-md-4"> 
 <div class="card shadow-sm"> 
 <div class="card-body"> 
-<h5>Standard Deviation</h5> 
+<h5>Standard Deviation of Screentime</h5> 
 <p id="stdValue" class="display-6">--</p> 
 </div> 
 </div> 
@@ -99,7 +99,7 @@ async function loadExcel() {
     const data = await response.arrayBuffer();
     const workbook = XLSX.read(data, { type: "array" });
 
-    const sheetName = workbook.SheetNames[0];
+    const sheetName = workbook.SheetNames[4];
     const worksheet = workbook.Sheets[sheetName];
 
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
