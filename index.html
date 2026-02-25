@@ -167,7 +167,24 @@ function createCharts(data) {
     });
 }
 
-loadExcel();
+loadExcel(
+ const screenColIndex = 4;
+const sleepColIndex = 7; 
+
+const screenData = jsonData
+    .map(row => row[screenColIndex])
+    .filter(v => v !== undefined && v !== "")
+    .map(Number)
+    .filter(v => !isNaN(v));
+
+const sleepData = jsonData
+    .map(row => row[sleepColIndex])
+    .filter(v => v !== undefined && v !== "")
+    .map(Number)
+    .filter(v => !isNaN(v));
+
+updateStatistics(screenData);
+createCharts(sleepData, screenData););
 </script>
 </body> 
 </html>
