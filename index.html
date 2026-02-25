@@ -95,25 +95,52 @@ Placeholder </p>
 
 <script> 
 async function loadExcel() {
-   const screenColIndex = 4;
-const sleepColIndex = 7; 
+    try {
+        // Load the Excel file from GitHub
+        const response = await fetch("Book.xlsx");
+        const data = await response.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
 
-const screenData = jsonData
-    .map(row => row[screenColIndex])
-    .filter(v => v !== undefined && v !== "")
-    .map(Number)
-    .filter(v => !isNaN(v));
+        // Use the first sheet
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
 
-const sleepData = jsonData
-    .map(row => row[sleepColIndex])
-    .filter(v => v !== undefined && v !== "")
-    .map(Number)
-    .filter(v => !isNaN(v));
+        // Convert sheet to array of rows
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-updateStatistics(screenData);
-createCharts(sleepData, screenData);
+        
+        const screenColIndex = 4; // Average Screentime
+        const sleepColIndex = 6;  // Sleep Hours
+
+        const screenData = [];
+        const sleepData = [];
+
+        for (let i = 1; i < jsonData.length; i++) { // start at 1 if row 0 is header
+            const row = jsonData[i];
+            const screenVal = row[screenColIndex];
+            const sleepVal = row[sleepColIndex];
+
+            if (screenVal !== undefined && sleepVal !== undefined) {
+                const screenNum = Number(screenVal);
+                const sleepNum = Number(sleepVal);
+
+                if (!isNaN(screenNum) && !isNaN(sleepNum)) {
+                    screenData.push(screenNum);
+                    sleepData.push(sleepNum);
+                }
+            }
+        }
+
+        // Update stats using screentime data
+        updateStatistics(screenData);
+
+        // Create scatter chart with sleep vs screentime
+        createCharts(sleepData, screenData);
+
+    } catch (err) {
+        console.error("Error loading Excel file:", err);
+    }
 }
-
 function mean(arr) {
     return arr.reduce((a,b) => a + b, 0) / arr.length;
 }
