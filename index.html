@@ -93,33 +93,38 @@ Placeholder </p>
 </div> 
 </footer> 
 
-<script> 
+
+<script>
 async function loadExcel() {
     try {
-        // Load the Excel file from GitHub
+        // Load Excel file
         const response = await fetch("Book.xlsx");
         const data = await response.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
 
-        // Use the first sheet
+        // Use first sheet
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
 
         // Convert sheet to array of rows
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-        
-        const screenColIndex = 4; // Average Screentime
-        const sleepColIndex = 6;  // Sleep Hours
+        // Column indices (0-based)
+        const screenColIndex = 4; // Column E = Average Screentime
+        const sleepColIndex = 6;  // Column G = Sleep Hours
 
         const screenData = [];
         const sleepData = [];
 
-        for (let i = 1; i < jsonData.length; i++) { // start at 1 if row 0 is header
+        // Loop through each row
+        for (let i = 1; i < jsonData.length; i++) { // skip header row
             const row = jsonData[i];
+            if (!row) continue; // skip empty rows
+
             const screenVal = row[screenColIndex];
             const sleepVal = row[sleepColIndex];
 
+            // Only push valid numbers
             if (screenVal !== undefined && sleepVal !== undefined) {
                 const screenNum = Number(screenVal);
                 const sleepNum = Number(sleepVal);
@@ -131,31 +136,37 @@ async function loadExcel() {
             }
         }
 
-        // Update stats using screentime data
+        // If no data found, stop
+        if (screenData.length === 0 || sleepData.length === 0) {
+            console.error("No valid data found in Excel columns.");
+            return;
+        }
+
+        // Update statistics
         updateStatistics(screenData);
 
-        // Create scatter chart with sleep vs screentime
+        // Create scatter chart
         createCharts(sleepData, screenData);
 
     } catch (err) {
         console.error("Error loading Excel file:", err);
     }
 }
+
+// Statistics functions
 function mean(arr) {
-    return arr.reduce((a,b) => a + b, 0) / arr.length;
+    return arr.reduce((a,b)=>a+b,0)/arr.length;
 }
 
 function median(arr) {
-    const sorted = [...arr].sort((a,b) => a-b);
+    const sorted = [...arr].sort((a,b)=>a-b);
     const mid = Math.floor(sorted.length/2);
-    return sorted.length % 2 !== 0 
-        ? sorted[mid] 
-        : (sorted[mid-1] + sorted[mid]) / 2;
+    return arr.length % 2 !== 0 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
 }
 
 function stdDev(arr) {
     const m = mean(arr);
-    return Math.sqrt(arr.reduce((sq, n) => sq + Math.pow(n - m, 2), 0) / arr.length);
+    return Math.sqrt(arr.reduce((sq,n)=>sq+Math.pow(n-m,2),0)/arr.length);
 }
 
 function updateStatistics(data) {
@@ -164,69 +175,29 @@ function updateStatistics(data) {
     document.getElementById("stdValue").innerText = stdDev(data).toFixed(2);
 }
 
-function createCharts(data) {
-
-    const labels = data.map((_, i) => `Row ${i+1}`);
-
-    new Chart(document.getElementById("barChart"), {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Excel Data",
-                data: data,
-                backgroundColor: "rgba(54, 162, 235, 0.6)"
-            }]
-        }
-    });
+// Scatter chart function
 function createCharts(xData, yData) {
-
     new Chart(document.getElementById("barChart"), {
         type: "scatter",
         data: {
             datasets: [{
                 label: "Sleep vs Screentime",
-                data: xData.map((x, i) => ({ x: x, y: yData[i] })),
+                data: xData.map((x,i)=>({x:x, y:yData[i]})),
                 backgroundColor: "rgba(255, 99, 132, 0.7)"
             }]
         },
         options: {
             scales: {
-                x: {
-                    title: { display: true, text: "Sleep Hours Per Night" }
-                },
-                y: {
-                    title: { display: true, text: "Average Screentime (Hours)" }
-                }
-            }
-        }
-    });
-
-    new Chart(document.getElementById("lineChart"), {
-        type: "line",
-        data: {
-            labels: xData,
-            datasets: [{
-                label: "Screentime Trend",
-                data: yData,
-                borderColor: "rgba(54, 162, 235, 1)",
-                fill: false
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    title: { display: true, text: "Sleep Hours Per Night" }
-                },
-                y: {
-                    title: { display: true, text: "Average Screentime (Hours)" }
-                }
+                x: { title: { display:true, text:"Sleep Hours Per Night" } },
+                y: { title: { display:true, text:"Average Screentime (Hours)" } }
             }
         }
     });
 }
-  
+
+// Call the loader
 loadExcel();
+</script>
 </script>
 </body> 
 </html>
