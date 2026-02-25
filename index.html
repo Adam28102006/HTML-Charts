@@ -97,21 +97,21 @@ Placeholder </p>
 <script>
 async function loadExcel() {
     try {
-        // ==== CHANGE THIS TO YOUR RAW GITHUB URL ====
+        
         const rawUrl = "https://raw.githubusercontent.com/Adam28102006/HTML-Charts/main/Book.xlsx";
 
-        // Fetch Excel file
+        
         const response = await fetch(rawUrl);
         if (!response.ok) throw new Error("Failed to fetch Excel file");
 
         const data = await response.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
 
-        // First sheet
+       
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
 
-        // Convert to array of rows
+        
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         console.log("First 5 rows:", jsonData.slice(0,5));
 
@@ -122,7 +122,7 @@ async function loadExcel() {
         const screenData = [];
         const sleepData = [];
 
-        // Extract vertical columns, skip empty rows
+        
         for (let i = 1; i < jsonData.length; i++) { // skip header
             const row = jsonData[i];
             if (!row) continue;
@@ -149,18 +149,56 @@ async function loadExcel() {
             return;
         }
 
-        // Update stats
+        
         updateStatistics(screenData);
 
-        // Create scatter chart
+        
         createScatterChart(sleepData, screenData);
+const xColIndex2 = 7; // Column H
+        const yColIndex2 = 8; // Column I
+
+        const xData2 = [];
+        const yData2 = [];
+
+        for (let i = 1; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (!row) continue;
+
+            const xVal = row[xColIndex2];
+            const yVal = row[yColIndex2];
+
+            if (xVal !== undefined && yVal !== undefined) {
+                const xNum = Number(xVal);
+                const yNum = Number(yVal);
+                if (!isNaN(xNum) && !isNaN(yNum)) {
+                    xData2.push(xNum);
+                    yData2.push(yNum);
+                }
+            }
+        }
+
+        console.log("Second Chart X:", xData2);
+        console.log("Second Chart Y:", yData2);
+
+        if (xData2.length === 0 || yData2.length === 0) {
+            console.error("No valid data found for second chart!");
+        } else {
+            createLineChart(xData2, yData2);
+        }
 
     } catch (err) {
         console.error("Error loading Excel file:", err);
     }
 }
 
-// === Statistics functions ===
+       
+
+    } catch (err) {
+        console.error("Error loading Excel file:", err);
+    }
+}
+
+
 function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
 function median(arr) {
     const sorted = [...arr].sort((a,b)=>a-b);
@@ -177,7 +215,7 @@ function updateStatistics(data) {
     document.getElementById("stdValue").innerText = stdDev(data).toFixed(2);
 }
 
-// === Scatter chart ===
+
 function createScatterChart(xData, yData) {
     new Chart(document.getElementById("barChart"), {
         type: "scatter",
