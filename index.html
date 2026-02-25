@@ -104,7 +104,11 @@ async function loadExcel() {
 
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    const values = jsonData.slice(1).map(row => Number(row[4])).filter(v => !isNaN(v));
+    const values = jsonData
+     .map(row => row[4])
+     .filter(value => value !== undefined && value !== "")
+     .map(Number)
+     .filter(v => !isNaN(v));
 
     updateStatistics(values);
     createCharts(values);
