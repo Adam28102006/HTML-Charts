@@ -152,46 +152,6 @@ async function loadExcel() {
         
         updateStatistics(screenData);
 
-        
-        createScatterChart(sleepData, screenData);
-const xColIndex2 = 7; // Column H
-        const yColIndex2 = 8; // Column I
-
-        const xData2 = [];
-        const yData2 = [];
-
-        for (let i = 1; i < jsonData.length; i++) {
-            const row = jsonData[i];
-            if (!row) continue;
-
-            const xVal = row[xColIndex2];
-            const yVal = row[yColIndex2];
-
-            if (xVal !== undefined && yVal !== undefined) {
-                const xNum = Number(xVal);
-                const yNum = Number(yVal);
-                if (!isNaN(xNum) && !isNaN(yNum)) {
-                    xData2.push(xNum);
-                    yData2.push(yNum);
-                }
-            }
-        }
-
-        console.log("Second Chart X:", xData2);
-        console.log("Second Chart Y:", yData2);
-
-        if (xData2.length === 0 || yData2.length === 0) {
-            console.error("No valid data found for second chart!");
-        } else {
-            createLineChart(xData2, yData2);
-        }
-
-    } catch (err) {
-        console.error("Error loading Excel file:", err);
-    }
-}
-
-       
 
     } catch (err) {
         console.error("Error loading Excel file:", err);
