@@ -97,34 +97,39 @@ Placeholder </p>
 <script>
 async function loadExcel() {
     try {
-        // Load Excel file
-        const response = await fetch("Book.xlsx");
+        // ==== CHANGE THIS TO YOUR RAW GITHUB URL ====
+        const rawUrl = "https://raw.githubusercontent.com/Adam28102006/HTML-Charts/main/Book.xlsx";
+
+        // Fetch Excel file
+        const response = await fetch(rawUrl);
+        if (!response.ok) throw new Error("Failed to fetch Excel file");
+
         const data = await response.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
 
-        // Use first sheet
+        // First sheet
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
 
-        // Convert sheet to array of rows
+        // Convert to array of rows
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        console.log("First 5 rows:", jsonData.slice(0,5));
 
         // Column indices (0-based)
-        const screenColIndex = 4; // Column E = Average Screentime
-        const sleepColIndex = 7;  // Column G = Sleep Hours
+        const screenColIndex = 4; // Column E = Screentime
+        const sleepColIndex = 7;  // Column H = Sleep
 
         const screenData = [];
         const sleepData = [];
 
-        // Loop through each row
-        for (let i = 1; i < jsonData.length; i++) { // skip header row
+        // Extract vertical columns, skip empty rows
+        for (let i = 1; i < jsonData.length; i++) { // skip header
             const row = jsonData[i];
-            if (!row) continue; // skip empty rows
+            if (!row) continue;
 
             const screenVal = row[screenColIndex];
             const sleepVal = row[sleepColIndex];
 
-            // Only push valid numbers
             if (screenVal !== undefined && sleepVal !== undefined) {
                 const screenNum = Number(screenVal);
                 const sleepNum = Number(sleepVal);
@@ -136,47 +141,44 @@ async function loadExcel() {
             }
         }
 
-        // If no data found, stop
+        console.log("Screen Data:", screenData);
+        console.log("Sleep Data:", sleepData);
+
         if (screenData.length === 0 || sleepData.length === 0) {
-            console.error("No valid data found in Excel columns.");
+            console.error("No valid data found in the specified columns!");
             return;
         }
 
-        // Update statistics
+        // Update stats
         updateStatistics(screenData);
 
         // Create scatter chart
-        createCharts(sleepData, screenData);
+        createScatterChart(sleepData, screenData);
 
     } catch (err) {
         console.error("Error loading Excel file:", err);
     }
 }
 
-// Statistics functions
-function mean(arr) {
-    return arr.reduce((a,b)=>a+b,0)/arr.length;
-}
-
+// === Statistics functions ===
+function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
 function median(arr) {
     const sorted = [...arr].sort((a,b)=>a-b);
     const mid = Math.floor(sorted.length/2);
     return arr.length % 2 !== 0 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
 }
-
 function stdDev(arr) {
     const m = mean(arr);
     return Math.sqrt(arr.reduce((sq,n)=>sq+Math.pow(n-m,2),0)/arr.length);
 }
-
 function updateStatistics(data) {
     document.getElementById("meanValue").innerText = mean(data).toFixed(2);
     document.getElementById("medianValue").innerText = median(data).toFixed(2);
     document.getElementById("stdValue").innerText = stdDev(data).toFixed(2);
 }
 
-// Scatter chart function
-function createCharts(xData, yData) {
+// === Scatter chart ===
+function createScatterChart(xData, yData) {
     new Chart(document.getElementById("barChart"), {
         type: "scatter",
         data: {
@@ -195,10 +197,10 @@ function createCharts(xData, yData) {
     });
 }
 
-// Call the loader
+
 loadExcel();
 </script>
-</script>
+
 </body> 
 </html>
 
