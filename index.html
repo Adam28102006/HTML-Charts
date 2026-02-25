@@ -95,23 +95,23 @@ Placeholder </p>
 
 <script> 
 async function loadExcel() {
-    const response = await fetch("Book.xlsx");
-    const data = await response.arrayBuffer();
-    const workbook = XLSX.read(data, { type: "array" });
+   const screenColIndex = 4;
+const sleepColIndex = 7; 
 
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+const screenData = jsonData
+    .map(row => row[screenColIndex])
+    .filter(v => v !== undefined && v !== "")
+    .map(Number)
+    .filter(v => !isNaN(v));
 
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+const sleepData = jsonData
+    .map(row => row[sleepColIndex])
+    .filter(v => v !== undefined && v !== "")
+    .map(Number)
+    .filter(v => !isNaN(v));
 
-    const values = jsonData
-     .map(row => row[4])
-     .filter(value => value !== undefined && value !== "")
-     .map(Number)
-     .filter(v => !isNaN(v));
-
-    updateStatistics(values);
-    createCharts(values);
+updateStatistics(screenData);
+createCharts(sleepData, screenData);
 }
 
 function mean(arr) {
@@ -167,24 +167,7 @@ function createCharts(data) {
     });
 }
 
-loadExcel(
- const screenColIndex = 4;
-const sleepColIndex = 7; 
-
-const screenData = jsonData
-    .map(row => row[screenColIndex])
-    .filter(v => v !== undefined && v !== "")
-    .map(Number)
-    .filter(v => !isNaN(v));
-
-const sleepData = jsonData
-    .map(row => row[sleepColIndex])
-    .filter(v => v !== undefined && v !== "")
-    .map(Number)
-    .filter(v => !isNaN(v));
-
-updateStatistics(screenData);
-createCharts(sleepData, screenData););
+loadExcel();
 </script>
 </body> 
 </html>
