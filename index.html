@@ -43,8 +43,7 @@ color: white;
 This is a placeholder paragraph 
 </p> 
 
-
- <script>
+<script>
 async function loadExcel() {
     const response = await fetch("Book.xlsx");
     const data = await response.arrayBuffer();
@@ -55,7 +54,6 @@ async function loadExcel() {
 
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    // Extract first column (skip header if exists)
     const values = jsonData.slice(1).map(row => Number(row[0])).filter(v => !isNaN(v));
 
     updateStatistics(values);
@@ -118,33 +116,6 @@ function createCharts(data) {
 loadExcel();
 </script>
  
-<div class="row text-center"> 
-<div class="col-md-4"> 
-<div class="card shadow-sm"> 
-<div class="card-body"> 
-<h5>Mean</h5> 
-<p id="meanValue" class="display-6">--</p> 
-</div> 
-</div> 
-</div> 
-<div class="col-md-4"> 
-<div class="card shadow-sm"> 
-<div class="card-body"> 
-<h5>Median</h5> 
-<p id="medianValue" class="display-6">--</p> 
-</div> 
-</div> 
-</div> 
-<div class="col-md-4"> 
-<div class="card shadow-sm"> 
-<div class="card-body"> 
-<h5>Standard Deviation</h5> 
-<p id="stdValue" class="display-6">--</p> 
-</div> 
-</div> 
-</div> 
-</div> 
-
 <h2 class="section-title">Data Visualisation</h2> 
 <div class="row"> 
 <div class="col-md-6"> 
