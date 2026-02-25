@@ -43,6 +43,81 @@ color: white;
 This is a placeholder paragraph 
 </p> 
 
+
+ <script>
+async function loadExcel() {
+    const response = await fetch("Book.xlsx");
+    const data = await response.arrayBuffer();
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    // Extract first column (skip header if exists)
+    const values = jsonData.slice(1).map(row => Number(row[0])).filter(v => !isNaN(v));
+
+    updateStatistics(values);
+    createCharts(values);
+}
+
+function mean(arr) {
+    return arr.reduce((a,b) => a + b, 0) / arr.length;
+}
+
+function median(arr) {
+    const sorted = [...arr].sort((a,b) => a-b);
+    const mid = Math.floor(sorted.length/2);
+    return sorted.length % 2 !== 0 
+        ? sorted[mid] 
+        : (sorted[mid-1] + sorted[mid]) / 2;
+}
+
+function stdDev(arr) {
+    const m = mean(arr);
+    return Math.sqrt(arr.reduce((sq, n) => sq + Math.pow(n - m, 2), 0) / arr.length);
+}
+
+function updateStatistics(data) {
+    document.getElementById("meanValue").innerText = mean(data).toFixed(2);
+    document.getElementById("medianValue").innerText = median(data).toFixed(2);
+    document.getElementById("stdValue").innerText = stdDev(data).toFixed(2);
+}
+
+function createCharts(data) {
+
+    const labels = data.map((_, i) => `Row ${i+1}`);
+
+    new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Excel Data",
+                data: data,
+                backgroundColor: "rgba(54, 162, 235, 0.6)"
+            }]
+        }
+    });
+
+    new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Trend",
+                data: data,
+                borderColor: "rgba(255, 99, 132, 1)",
+                fill: false
+            }]
+        }
+    });
+}
+
+loadExcel();
+</script>
+ 
 <div class="row text-center"> 
 <div class="col-md-4"> 
 <div class="card shadow-sm"> 
