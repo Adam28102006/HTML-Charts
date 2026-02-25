@@ -179,21 +179,53 @@ function createCharts(data) {
             }]
         }
     });
+function createCharts(xData, yData) {
+
+    new Chart(document.getElementById("barChart"), {
+        type: "scatter",
+        data: {
+            datasets: [{
+                label: "Sleep vs Screentime",
+                data: xData.map((x, i) => ({ x: x, y: yData[i] })),
+                backgroundColor: "rgba(255, 99, 132, 0.7)"
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: { display: true, text: "Sleep Hours Per Night" }
+                },
+                y: {
+                    title: { display: true, text: "Average Screentime (Hours)" }
+                }
+            }
+        }
+    });
 
     new Chart(document.getElementById("lineChart"), {
         type: "line",
         data: {
-            labels: labels,
+            labels: xData,
             datasets: [{
-                label: "Trend",
-                data: data,
-                borderColor: "rgba(255, 99, 132, 1)",
+                label: "Screentime Trend",
+                data: yData,
+                borderColor: "rgba(54, 162, 235, 1)",
                 fill: false
             }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: { display: true, text: "Sleep Hours Per Night" }
+                },
+                y: {
+                    title: { display: true, text: "Average Screentime (Hours)" }
+                }
+            }
         }
     });
 }
-
+  
 loadExcel();
 </script>
 </body> 
